@@ -7,28 +7,64 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Kdo jsi?");
+        System.out.println("1. Alice");
+        System.out.println("2. Bob");
+        int choice = Integer.parseInt(sc.nextLine());
 
         //1. Vytvořit Super rostoucí sekvenci
-        int[] superGrowingSeq = generateSuperGrowingSequence(8);
+        long[] superGrowingSeq = generateSuperGrowingSequence(16);
 
         //2. Vygenerovat U a V a V^-1
-        int u = generateU(superGrowingSeq);
-        int v = generateV(u);
-        int vInverse = pleaseGiveMeVInverse(v, u);
+        long u = generateU(superGrowingSeq);
+        long v = generateV(u);
+        long vInverse = pleaseGiveMeVInverse(v, u);
 
         //3. Předelat SRS do modulované sekvence(SGS[0] * v % u)
-        int[] modulatedSequence = generateModulatedSequence(superGrowingSeq, v, u);
+        long[] modulatedSequence = generateModulatedSequence(superGrowingSeq, v, u);
+        if (choice == 1) {
+            sout(modulatedSequence);
+        } else {
+            System.out.println("Zadej public klíč");
+            String input = sc.nextLine();
+            String[] numbers = input.substring(1, input.length() - 1).split(", ");
+            long[] et = new long[numbers.length];
+            for (int i = 0; i < numbers.length; i++) {
+                et[i] = Long.parseLong(numbers[i]);
+            }
+            System.out.println("Zadej zpravu");
+            String message = sc.nextLine();
+            System.out.println(pleaseGiveMeET(message, et));
+
+            System.out.println("Ahoj alice, zadej zasifrovanou zpravu");
+            String codedMessage = sc.nextLine();
+            System.out.println(pleaseGiveMeDT(Long.parseLong(codedMessage), vInverse, u, superGrowingSeq));
+        }
+
+
+        /*
+        //1. Vytvořit Super rostoucí sekvenci
+        long[] superGrowingSeq = generateSuperGrowingSequence(16);
+
+        //2. Vygenerovat U a V a V^-1
+        long u = generateU(superGrowingSeq);
+        long v = generateV(u);
+        long vInverse = pleaseGiveMeVInverse(v, u);
+
+        //3. Předelat SRS do modulované sekvence(SGS[0] * v % u)
+        long[] modulatedSequence = generateModulatedSequence(superGrowingSeq, v, u);
 
         //4. Vytvořit public klíč (Et) podle vstupu
         Scanner sc = new Scanner(System.in);
         System.out.println("Please put char input to code");
-        char input = sc.nextLine().charAt(0);
-        int publicKey = pleaseGiveMeET(input, modulatedSequence);
+        String input = sc.nextLine();
+        long publicKey = pleaseGiveMeET(input, modulatedSequence);
 
         //5. Rozkódovat private Klíčem
-        char decodedInput = pleaseGiveMeDT(publicKey, vInverse, u, superGrowingSeq);
+        String decodedInput = pleaseGiveMeDT(publicKey, vInverse, u, superGrowingSeq);
         System.out.println(decodedInput);
+        */
 
         /*
         int[] superGrowingSeq = new int[]{4, 14, 19, 39, 79, 161, 325, 643};
@@ -54,21 +90,31 @@ public class Main {
          */
     }
 
-    public static int[] generateSuperGrowingSequence(int length) {
+    private static void sout(long[] arr) {
+        System.out.print("[");
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i]);
+            if (i < arr.length - 1) System.out.print(", ");
+        }
+        System.out.print("]");
+        System.out.println();
+    }
+
+    public static long[] generateSuperGrowingSequence(int length) {
         Random random = new Random();
-        int[] a = new int[length];
-        int sum = 0;
+        long[] a = new long[length];
+        long sum = 0;
         for (int i = 0; i < a.length; i++) {
-            int rand = random.nextInt(10) + sum + 1;
+            long rand = random.nextInt(10) + sum + 1;
             a[i] = rand;
             sum += rand;
         }
         return a;
     }
 
-    public static void intReverse(int[] array) {
+    public static void intReverse(long[] array) {
         for (int i = 0; i < array.length / 2; i++) {
-            int j = array[i];
+            long j = array[i];
             array[i] = array[array.length - i - 1];
             array[array.length - i - 1] = j;
         }
@@ -82,9 +128,9 @@ public class Main {
         }
     }
 
-    public static int pleaseGiveMeET(char input, int[] moduledSuperGrowingSeq) {
-        String binary = Integer.toBinaryString(input);
-        int sum = 0;
+    public static long pleaseGiveMeET(String input, long[] moduledSuperGrowingSeq) {
+        String binary = getBinaryFromInput(input);
+        long sum = 0;
         String[] arr = binary.split("");
         stringReverse(arr);
         intReverse(moduledSuperGrowingSeq);
@@ -94,9 +140,24 @@ public class Main {
         return sum;
     }
 
-    public static char pleaseGiveMeDT(int sum, int vMinus, int u, int[] superGrowingSeq) {
+    public static String getBinaryFromInput(String input) {
+        char input1 = input.charAt(0);
+        char input2 = input.charAt(1);
+        StringBuilder sb1 = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder();
+        StringBuilder sb3 = new StringBuilder();
+        String binary1 = Integer.toBinaryString(input1);
+        String binary2 = Integer.toBinaryString(input2);
+        sb1.append(binary1).reverse();
+        sb2.append(binary2).reverse();
+        while (sb1.length() <= 7) sb1.append("0");
+        while (sb2.length() <= 7) sb2.append("0");
+        return sb3.append(sb1.reverse()).append(sb2.reverse()).toString();
+    }
+
+    public static String pleaseGiveMeDT(long sum, long vMinus, long u, long[] superGrowingSeq) {
         StringBuilder sb = new StringBuilder();
-        int Dt = sum * vMinus % u;
+        long Dt = sum * vMinus % u;
         intReverse(superGrowingSeq);
         for (int i = 0; i < superGrowingSeq.length; i++) {
             if (Dt - superGrowingSeq[i] >= 0) {
@@ -106,40 +167,45 @@ public class Main {
 
 
         }
-        return (char) (Integer.parseInt(sb.reverse().toString(), 2));
+        char first = (char) (Integer.parseInt(sb.reverse().substring(0, 8), 2));
+        char second = (char) (Integer.parseInt(sb.substring(8), 2));
+        sb.setLength(0);
+        sb.append(first).append(second);
+        return sb.toString();
     }
 
-    public static int[] generateModulatedSequence(int[] superGrowingSeq, int V, int U) {
-        int[] E = new int[superGrowingSeq.length];
+    public static long[] generateModulatedSequence(long[] superGrowingSeq, long V, long U) {
+        long[] E = new long[superGrowingSeq.length];
         for (int i = 0; i < E.length; i++) {
             E[i] = superGrowingSeq[i] * V % U;
         }
         return E;
     }
 
-    public static int generateU(int[] superGrowingSeq) {
+
+    public static long generateU(long[] superGrowingSeq) {
         Random random = new Random();
-        int sumOfSGS = Arrays.stream(superGrowingSeq).sum();
-        int U = random.nextInt(50) + sumOfSGS + 1;
+        long sumOfSGS = Arrays.stream(superGrowingSeq).sum();
+        long U = random.nextInt(50) + sumOfSGS + 1;
         while (!isNumberPrimary(U)) U = random.nextInt(50) + sumOfSGS + 1;
         return U;
     }
 
-    public static int generateV(int U) {
+    public static long generateV(long U) {
         Random rand = new Random();
-        int V = rand.nextInt((U - 1) - 1) + 1;
-        while (!isNumberPrimary(V)) V = rand.nextInt((U - 1) - 1) + 1;
+        long V = rand.nextLong((U - 1) - 1) + 1;
+        while (!isNumberPrimary(V)) V = rand.nextLong((U - 1) - 1) + 1;
         return V;
     }
 
-    public static int pleaseGiveMeVInverse(int V, int U) {
+    public static long pleaseGiveMeVInverse(long V, long U) {
         for (int i = 1; i < U - 1; i++) {
             if (V * i % U == 1) return i;
         }
         return -1;
     }
 
-    public static boolean isNumberPrimary(int number) {
+    public static boolean isNumberPrimary(long number) {
         for (int i = 2; i < Math.sqrt(number); i++) {
             if (number % i == 0) return false;
         }
