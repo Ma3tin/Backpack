@@ -25,6 +25,9 @@ public class Main {
         long[] modulatedSequence = generateModulatedSequence(superGrowingSeq, v, u);
         if (choice == 1) {
             sout(modulatedSequence);
+            System.out.println("Zadej zprávu");
+            long sum = Long.parseLong(sc.nextLine());
+            System.out.println(pleaseGiveMeDT(sum, vInverse, u, superGrowingSeq));
         } else {
             System.out.println("Zadej public klíč");
             String input = sc.nextLine();
@@ -36,10 +39,6 @@ public class Main {
             System.out.println("Zadej zpravu");
             String message = sc.nextLine();
             System.out.println(pleaseGiveMeET(message, et));
-
-            System.out.println("Ahoj alice, zadej zasifrovanou zpravu");
-            String codedMessage = sc.nextLine();
-            System.out.println(pleaseGiveMeDT(Long.parseLong(codedMessage), vInverse, u, superGrowingSeq));
         }
 
 
