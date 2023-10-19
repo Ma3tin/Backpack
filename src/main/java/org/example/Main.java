@@ -13,21 +13,20 @@ public class Main {
         System.out.println("2. Bob");
         int choice = Integer.parseInt(sc.nextLine());
 
-        //1. Vytvořit Super rostoucí sekvenci
         long[] superGrowingSeq = generateSuperGrowingSequence(16);
 
-        //2. Vygenerovat U a V a V^-1
         long u = generateU(superGrowingSeq);
         long v = generateV(u);
         long vInverse = pleaseGiveMeVInverse(v, u);
 
-        //3. Předelat SRS do modulované sekvence(SGS[0] * v % u)
         long[] modulatedSequence = generateModulatedSequence(superGrowingSeq, v, u);
+        long[] reversedModulated = intReverse(modulatedSequence);
+        long[] reversedSGQ = intReverse(superGrowingSeq);
         if (choice == 1) {
-            sout(modulatedSequence);
+            sout(reversedModulated);
             System.out.println("Zadej zprávu");
-            long sum = Long.parseLong(sc.nextLine());
-            System.out.println(pleaseGiveMeDT(sum, vInverse, u, superGrowingSeq));
+            String sum = sc.nextLine();
+            System.out.println(giveMeDT(sum, vInverse, u, reversedSGQ));
         } else {
             System.out.println("Zadej public klíč");
             String input = sc.nextLine();
@@ -36,11 +35,11 @@ public class Main {
             for (int i = 0; i < numbers.length; i++) {
                 et[i] = Long.parseLong(numbers[i]);
             }
+            intReverse(et);
             System.out.println("Zadej zpravu");
             String message = sc.nextLine();
-            System.out.println(pleaseGiveMeET(message, et));
+            System.out.println(giveMeEt(message, et));
         }
-
 
         /*
         //1. Vytvořit Super rostoucí sekvenci
@@ -58,10 +57,14 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please put char input to code");
         String input = sc.nextLine();
-        long publicKey = pleaseGiveMeET(input, modulatedSequence);
+        long[] reversedModulated = intReverse(modulatedSequence);
+        long[] reversedSGQ = intReverse(superGrowingSeq);
+        //String[] reversedString = stringReverse()
+        String publicKey = giveMeEt(input, modulatedSequence);
+        System.out.println(publicKey);
 
         //5. Rozkódovat private Klíčem
-        String decodedInput = pleaseGiveMeDT(publicKey, vInverse, u, superGrowingSeq);
+        String decodedInput = giveMeDT(publicKey, vInverse, u, reversedSGQ);
         System.out.println(decodedInput);
         */
 
@@ -111,32 +114,48 @@ public class Main {
         return a;
     }
 
-    public static void intReverse(long[] array) {
+    public static long[] intReverse(long[] array) {
         for (int i = 0; i < array.length / 2; i++) {
             long j = array[i];
             array[i] = array[array.length - i - 1];
             array[array.length - i - 1] = j;
         }
+        return array;
     }
 
-    public static void stringReverse(String[] array) {
+    public static String[] stringReverse(String[] array) {
         for (int i = 0; i < array.length / 2; i++) {
             String j = array[i];
             array[i] = array[array.length - i - 1];
             array[array.length - i - 1] = j;
         }
+        return array;
+    }
+
+    public static String giveMeEt(String input, long[] moduledSuperGrowingSeq) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        String[] splittedInput = splitLongInput(input);
+        for (int i = 0; i < splittedInput.length; i++) {
+            sb.append(pleaseGiveMeET(splittedInput[i], moduledSuperGrowingSeq));
+            if (i < splittedInput.length - 1) sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     public static long pleaseGiveMeET(String input, long[] moduledSuperGrowingSeq) {
         String binary = getBinaryFromInput(input);
         long sum = 0;
         String[] arr = binary.split("");
-        stringReverse(arr);
-        intReverse(moduledSuperGrowingSeq);
+        arr = stringReverse(arr);
         for (int i = 0; i < arr.length; i++) {
             if (arr[i].equals("1")) sum += moduledSuperGrowingSeq[i];
         }
         return sum;
+    }
+    public static String[] splitLongInput(String text) {
+        return text.split("(?<=\\G.{" + 2 + "})");
     }
 
     public static String getBinaryFromInput(String input) {
@@ -154,10 +173,21 @@ public class Main {
         return sb3.append(sb1.reverse()).append(sb2.reverse()).toString();
     }
 
+
+    public static String giveMeDT(String sum, long vMinus, long u, long[] superGrowingSeq) {
+        String[] sums = sum.substring(1, sum.length() - 1).split(", ");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < sums.length; i++) {
+            sb.append(pleaseGiveMeDT(Long.parseLong(sums[i]), vMinus, u, superGrowingSeq));
+        }
+        return sb.toString();
+    }
+
+
+
     public static String pleaseGiveMeDT(long sum, long vMinus, long u, long[] superGrowingSeq) {
         StringBuilder sb = new StringBuilder();
         long Dt = sum * vMinus % u;
-        intReverse(superGrowingSeq);
         for (int i = 0; i < superGrowingSeq.length; i++) {
             if (Dt - superGrowingSeq[i] >= 0) {
                 sb.append("1");
