@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+
         Scanner sc = new Scanner(System.in);
         System.out.println("Kdo jsi?");
         System.out.println("1. Alice");
@@ -20,13 +21,14 @@ public class Main {
         long vInverse = pleaseGiveMeVInverse(v, u);
 
         long[] modulatedSequence = generateModulatedSequence(superGrowingSeq, v, u);
-        long[] reversedModulated = intReverse(modulatedSequence);
-        long[] reversedSGQ = intReverse(superGrowingSeq);
+        intReverse(modulatedSequence);
+        intReverse(superGrowingSeq);
         if (choice == 1) {
-            sout(reversedModulated);
+            intReverse(modulatedSequence);
+            sout(modulatedSequence);
             System.out.println("Zadej zprávu");
             String sum = sc.nextLine();
-            System.out.println(giveMeDT(sum, vInverse, u, reversedSGQ));
+            System.out.println(giveMeDT(sum, vInverse, u, superGrowingSeq));
         } else {
             System.out.println("Zadej public klíč");
             String input = sc.nextLine();
@@ -40,8 +42,9 @@ public class Main {
             String message = sc.nextLine();
             System.out.println(giveMeEt(message, et));
         }
-
         /*
+
+
         //1. Vytvořit Super rostoucí sekvenci
         long[] superGrowingSeq = generateSuperGrowingSequence(16);
 
@@ -57,16 +60,16 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please put char input to code");
         String input = sc.nextLine();
-        long[] reversedModulated = intReverse(modulatedSequence);
-        long[] reversedSGQ = intReverse(superGrowingSeq);
+        intReverse(modulatedSequence);
+        intReverse(superGrowingSeq);
         //String[] reversedString = stringReverse()
         String publicKey = giveMeEt(input, modulatedSequence);
         System.out.println(publicKey);
 
         //5. Rozkódovat private Klíčem
-        String decodedInput = giveMeDT(publicKey, vInverse, u, reversedSGQ);
+        String decodedInput = giveMeDT(publicKey, vInverse, u, superGrowingSeq);
         System.out.println(decodedInput);
-        */
+
 
         /*
         int[] superGrowingSeq = new int[]{4, 14, 19, 39, 79, 161, 325, 643};
@@ -114,13 +117,12 @@ public class Main {
         return a;
     }
 
-    public static long[] intReverse(long[] array) {
+    public static void intReverse(long[] array) {
         for (int i = 0; i < array.length / 2; i++) {
             long j = array[i];
             array[i] = array[array.length - i - 1];
             array[array.length - i - 1] = j;
         }
-        return array;
     }
 
     public static String[] stringReverse(String[] array) {
@@ -155,6 +157,7 @@ public class Main {
         return sum;
     }
     public static String[] splitLongInput(String text) {
+        if (text.length() % 2 != 0) text += " ";
         return text.split("(?<=\\G.{" + 2 + "})");
     }
 
